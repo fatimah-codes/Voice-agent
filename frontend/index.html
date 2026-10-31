@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MindAI Voice Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Questrial&display=block">
+  <style>
+:root {
+  --ink: #000000;
+  --bg: #F6EAF2;
+  --hairline: rgba(0, 0, 0, 0.28);
+  --glass: rgba(255, 255, 255, 0.28);
+  --glass-card: rgba(255, 255, 255, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Questrial', system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* ==========================================================================
+   BACKGROUND ANIMATION SCENE (Aurora Blobs, Cognitive Rings, Twinkle Stars)
+   ========================================================================== */
+.bg-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Iridescent Aurora Gradient Blobs */
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  will-change: transform;
+}
+
+.blob-1 {
+  width: 50vw;
+  height: 50vw;
+  top: -15%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(255, 175, 215, 0.7) 0%, rgba(255, 205, 230, 0.2) 70%, transparent 100%);
+  animation: float-blob-1 18s ease-in-out infinite alternate;
+}
+
+.blob-2 {
+  width: 55vw;
+  height: 55vw;
+  bottom: -20%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(160, 210, 255, 0.65) 0%, rgba(200, 230, 255, 0.2) 70%, transparent 100%);
+  animation: float-blob-2 22s ease-in-out infinite alternate;
+}
+
+.blob-3 {
+  width: 40vw;
+  height: 40vw;
+  top: 30%;
+  right: 15%;
+  background: radial-gradient(circle, rgba(215, 180, 255, 0.55) 0%, rgba(240, 210, 255, 0.15) 70%, transparent 100%);
+  animation: float-blob-3 15s ease-in-out infinite alternate;
+}
+
+.blob-4 {
+  width: 35vw;
+  height: 35vw;
+  bottom: 10%;
+  left: 10%;
+  background: radial-gradient(circle, rgba(255, 220, 180, 0.5) 0%, rgba(255, 240, 210, 0.2) 70%, transparent 100%);
+  animation: float-blob-4 20s ease-in-out infinite alternate;
+}
+
+@keyframes float-blob-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(12vw, 8vh) scale(1.12); }
+  100% { transform: translate(4vw, 15vh) scale(0.95); }
+}
+
+@keyframes float-blob-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-10vw, -12vh) scale(1.1); }
+  100% { transform: translate(-5vw, -5vh) scale(0.92); }
+}
+
+@keyframes float-blob-3 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-8vw, 10vh) scale(1.15); }
+  100% { transform: translate(-15vw, -6vh) scale(0.9); }
+}
+
+@keyframes float-blob-4 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10vw, -10vh) scale(1.18); }
+  100% { transform: translate(18vw, 6vh) scale(0.92); }
+}
+
+/* Ambient Concentric Soundwave / Cognitive Ripples */
+.concentric-rings {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vw, 750px);
+  height: min(90vw, 750px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.c-ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ring-1 { width: 55%; height: 55%; animation: ring-pulse 6s infinite ease-in-out; }
+.ring-2 { width: 75%; height: 75%; animation: ring-pulse 8s infinite ease-in-out 1.5s; }
+.ring-3 { width: 95%; height: 95%; animation: ring-pulse 10s infinite ease-in-out 3s; }
+
+body[data-state="listening"] .c-ring {
+  border-color: rgba(229, 57, 53, 0.18);
+  animation-duration: 2s !important;
+}
+
+body[data-state="thinking"] .c-ring {
+  border-color: rgba(142, 36, 170, 0.22);
+  animation-duration: 2.5s !important;
+}
+
+body[data-state="speaking"] .c-ring {
+  border-color: rgba(30, 136, 229, 0.25);
+  animation-duration: 1.6s !important;
+}
+
+@keyframes ring-pulse {
+  0% { transform: scale(0.96); opacity: 0.3; }
+  50% { transform: scale(1.04); opacity: 0.8; }
+  100% { transform: scale(0.96); opacity: 0.3; }
+}
+
+/* Star Dust Canvas */
+.star-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ==========================================================================
+   TOP MASTHEAD
+   ========================================================================== */
+.masthead {
+  width: 100%;
+  padding: 24px 36px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 20;
+}
+
+.icon-btn {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  transition: opacity 0.2s, transform 0.2s;
+  padding: 6px;
+  border-radius: 50%;
+}
+.icon-btn:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.logo {
+  width: 52px;
+  height: 33px;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   CENTERED 3D FIGURE STAGE
+   ========================================================================== */
+.stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: filter 0.5s ease, opacity 0.5s ease;
+}
+
+body.locked .stage {
+  filter: blur(14px);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.figure-wrapper {
+  position: relative;
+  width: min(85vw, 540px);
+  aspect-ratio: 1049 / 1032;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.figure-wrapper:hover {
+  transform: scale(1.02);
+}
+
+.figure-wrapper:active {
+  transform: scale(0.99);
+}
+
+/* Active Aura Rings behind Bust */
+.aura-ring {
+  position: absolute;
+  width: 82%;
+  height: 82%;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+
+body[data-state="listening"] .aura-ring {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(255,140,190,0.45) 0%, rgba(130,210,255,0.25) 50%, transparent 75%);
+  animation: aura-pulse 1.8s infinite ease-in-out;
+}
+
+body[data-state="thinking"] .aura-ring {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(200,160,255,0.5) 0%, rgba(255,180,220,0.3) 50%, transparent 75%);
+  animation: aura-spin 2.4s infinite linear;
+}
+
+body[data-state="speaking"] .aura-ring {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(140,220,255,0.55) 0%, rgba(255,160,200,0.35) 50%, transparent 75%);
+  animation: aura-wave 1.2s infinite ease-in-out;
+}
+
+@keyframes aura-pulse {
+  0% { transform: scale(0.85); opacity: 0.35; }
+  50% { transform: scale(1.18); opacity: 0.8; }
+  100% { transform: scale(0.85); opacity: 0.35; }
+}
+
+@keyframes aura-spin {
+  0% { transform: scale(0.95) rotate(0deg); opacity: 0.4; }
+  50% { transform: scale(1.1) rotate(180deg); opacity: 0.75; }
+  100% { transform: scale(0.95) rotate(360deg); opacity: 0.4; }
+}
+
+@keyframes aura-wave {
+  0% { transform: scale(0.9); opacity: 0.45; }
+  50% { transform: scale(1.25); opacity: 0.9; }
+  100% { transform: scale(0.9); opacity: 0.45; }
+}
+
+/* 3D Bust Mask and Video */
+.bust-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 9%, #000 100%);
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 9%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.bust-v {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  display: block;
+  filter: brightness(1.18) saturate(1.22);
+  mix-blend-mode: multiply;
+  transform-origin: 50% 100%;
+}
+
+/* Touch Trigger Pill Indicator */
+.touch-trigger {
+  position: absolute;
+  bottom: -46px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 22px;
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--hairline);
+  border-radius: 28px;
+  font-size: 14.5px;
+  letter-spacing: 0.03em;
+  color: #000;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+.touch-trigger:hover {
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(0, 0, 0, 0.55);
+  transform: translateY(-2px);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #000;
+  transition: all 0.3s ease;
+}
+
+body[data-state="listening"] .status-dot {
+  background: #E53935;
+  box-shadow: 0 0 10px #E53935;
+  animation: blink 0.8s infinite;
+}
+
+body[data-state="thinking"] .status-dot {
+  background: #8E24AA;
+  box-shadow: 0 0 10px #8E24AA;
+  animation: blink 0.6s infinite;
+}
+
+body[data-state="speaking"] .status-dot {
+  background: #1E88E5;
+  box-shadow: 0 0 10px #1E88E5;
+  animation: pulse-dot 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(0.8); }
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(0.9); }
+}
+
+/* Subtitle for Spoken Response or Error */
+.subtitle-bar {
+  max-width: 620px;
+  width: 90%;
+  margin: 0 auto 32px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: #222;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.subtitle-bar.visible {
+  opacity: 0.95 !important;
+  transform: translateY(0) !important;
+}
+
+.subtitle-bar.error-text {
+  color: #C62828 !important;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   MINIMALIST API KEY GATEWAY (Frosted Glass Modal)
+   ========================================================================== */
+.key-gate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background: rgba(246, 234, 242, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+body.locked .key-gate {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gate-card {
+  width: min(90vw, 420px);
+  padding: 38px 32px 34px;
+  background: var(--glass-card);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--hairline);
+  border-radius: 28px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transform: scale(0.96);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.locked .gate-card {
+  transform: scale(1);
+}
+
+.gate-title {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #000;
+  margin-top: 4px;
+}
+
+.gate-sub {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 1.45;
+  max-width: 320px;
+}
+
+.input-box {
+  width: 100%;
+  position: relative;
+  margin-top: 6px;
+}
+
+.key-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 52px 0 20px;
+  border-radius: 24px;
+  border: 1px solid var(--hairline);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  font-family: inherit;
+  font-size: 14.5px;
+  color: #000;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.key-input:focus {
+  border-color: #000;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.key-input::placeholder {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.submit-arrow {
+  position: absolute;
+  right: 6px;
+  top: 5px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.submit-arrow:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
+}
+
+.submit-arrow svg {
+  width: 16px;
+  height: 16px;
+  stroke: #fff;
+}
+
+.chip-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.sys-chip {
+  padding: 6px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.35);
+  font-size: 12.5px;
+  color: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sys-chip:hover {
+  border-color: #000;
+  color: #000;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.gate-msg {
+  font-size: 12.5px;
+  color: #D32F2F;
+  min-height: 16px;
+}
+  </style>
+</head>
+<body data-state="idle">
+
+  <!-- Background Animations (Aurora Blobs, Cognitive Ripples, Star Dust) -->
+  <div class="bg-scene">
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
+    <div class="aurora-blob blob-4"></div>
+
+    <div class="concentric-rings">
+      <div class="c-ring ring-1"></div>
+      <div class="c-ring ring-2"></div>
+      <div class="c-ring ring-3"></div>
+    </div>
+
+    <canvas id="starCanvas" class="star-canvas"></canvas>
+  </div>
+
+  <!-- Top Minimalist Masthead -->
+  <header class="masthead">
+    <button class="icon-btn" id="keyIconBtn" title="API Key Settings">
+      <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 2l-2 2m-1.5 1.5L14 9M3 21l6.5-6.5M10 14l2 2m1.5-1.5L15 16m2-2l2 2"/>
+        <circle cx="7.5" cy="16.5" r="4.5"/>
+      </svg>
+    </button>
+
+    <!-- Centered MindAI Logo -->
+    <svg class="logo" viewBox="0 0 60 38" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MindAI">
+      <path d="M27.40 34.52 C27.59 34.43 27.80 34.24 27.87 34.10 C28.07 33.71 28.05 21.22 27.86 20.75 C27.57 20.06 27.67 20.07 23.23 20.18 C20.54 20.24 19.15 20.31 18.95 20.39 C18.00 20.77 17.83 21.72 18.57 22.46 C19.24 23.13 19.43 23.20 20.66 23.20 C21.27 23.20 22.02 23.15 22.31 23.08 C22.61 23.02 23.05 22.96 23.29 22.96 C23.65 22.96 23.77 23.01 24.01 23.27 C24.40 23.71 24.48 24.21 24.24 24.78 C24.13 25.03 23.92 25.32 23.77 25.44 C23.51 25.63 23.37 25.65 22.32 25.62 C18.00 25.51 16.98 25.24 15.55 23.83 C14.47 22.77 14.01 22.03 13.69 20.80 C13.36 19.56 13.38 18.26 13.73 16.95 C13.88 16.41 14.08 15.84 14.18 15.69 C15.55 13.60 16.89 12.64 18.81 12.41 C19.27 12.35 20.52 12.30 21.58 12.29 C23.22 12.28 23.54 12.30 23.76 12.44 C24.13 12.69 24.40 13.19 24.40 13.64 C24.40 13.95 24.33 14.09 24.00 14.42 L23.61 14.82 L22.38 14.73 C21.70 14.69 20.74 14.65 20.23 14.65 C19.37 14.65 19.30 14.67 18.88 14.96 C18.30 15.39 18.06 15.82 18.06 16.46 C18.06 17.02 18.24 17.39 18.66 17.67 C18.89 17.82 19.37 17.84 23.08 17.86 C27.68 17.89 27.59 17.90 27.85 17.27 C28.03 16.82 28.00 9.86 27.81 9.52 C27.55 9.03 27.29 9.00 23.23 9.00 C18.23 9.00 17.31 9.11 15.63 9.90 C14.14 10.60 12.78 11.84 11.88 13.32 C11.65 13.68 11.39 14.12 11.28 14.28 C11.18 14.45 10.90 15.16 10.67 15.87 L10.26 17.15 L10.25 19.05 L10.25 20.95 L10.71 22.15 C11.30 23.72 12.01 24.80 13.19 25.92 C14.16 26.85 15.03 27.42 16.22 27.92 C17.75 28.57 18.07 28.62 21.30 28.67 C24.43 28.71 24.55 28.73 24.81 29.21 C24.98 29.54 24.94 30.37 24.73 30.73 C24.38 31.33 24.05 31.42 22.35 31.35 C17.25 31.14 15.82 30.94 14.18 30.20 C12.97 29.64 11.70 28.82 10.92 28.06 C10.17 27.35 9.14 26.05 8.79 25.40 C8.63 25.10 8.40 24.70 8.28 24.51 C8.08 24.19 7.97 23.93 7.32 22.15 C7.08 21.51 7.06 21.29 7.02 19.48 C7.00 18.32 7.03 17.16 7.09 16.66 C7.24 15.53 8.00 13.33 8.52 12.50 C8.75 12.14 9.04 11.68 9.16 11.48 C9.48 10.98 10.98 9.50 11.73 8.95 C12.90 8.11 14.58 7.33 16.17 6.90 C18.15 6.36 19.12 6.28 23.42 6.31 C26.76 6.33 27.11 6.32 27.35 6.16 C27.71 5.92 27.90 5.43 27.90 4.73 C27.90 4.00 27.66 3.51 27.20 3.27 C26.87 3.10 26.51 3.09 22.00 3.13 C16.65 3.18 16.94 3.15 14.65 3.89 C13.26 4.35 11.68 5.08 10.82 5.68 C9.15 6.85 7.54 8.28 6.97 9.10 C6.80 9.35 6.53 9.70 6.37 9.89 C6.21 10.08 6.01 10.38 5.94 10.56 C5.86 10.74 5.62 11.17 5.41 11.50 C5.19 11.84 4.98 12.25 4.94 12.43 C4.91 12.61 4.70 13.18 4.49 13.70 C3.89 15.20 3.75 16.11 3.76 18.50 C3.77 20.71 3.97 22.65 4.29 23.55 C4.39 23.82 4.62 24.46 4.79 24.95 C4.96 25.45 5.23 26.03 5.39 26.25 C5.54 26.47 5.78 26.85 5.90 27.10 C6.54 28.35 8.93 30.70 11.06 32.16 C11.98 32.79 13.97 33.64 15.12 33.89 C15.63 34.00 16.43 34.19 16.90 34.31 C17.69 34.51 18.07 34.53 22.15 34.59 C24.57 34.63 26.66 34.67 26.80 34.68 C26.94 34.69 27.21 34.62 27.40 34.52 Z M39.85 34.57 C41.79 34.53 42.01 34.51 42.75 34.27 C43.19 34.13 43.91 33.92 44.35 33.81 C45.85 33.44 48.12 32.22 49.58 31.01 C50.26 30.44 51.75 28.79 52.38 27.91 C52.61 27.58 52.94 27.03 53.10 26.68 C53.26 26.33 53.48 25.91 53.60 25.75 C53.71 25.59 53.90 25.13 54.01 24.75 C54.12 24.37 54.37 23.60 54.56 23.04 C55.00 21.73 55.14 20.47 55.06 18.57 C54.98 16.69 54.86 15.91 54.44 14.64 C54.25 14.08 54.10 13.53 54.10 13.42 C54.10 13.31 53.94 12.91 53.74 12.54 C53.54 12.16 53.25 11.60 53.10 11.28 C52.94 10.97 52.68 10.57 52.52 10.38 C52.36 10.20 52.10 9.85 51.93 9.60 C51.57 9.07 49.89 7.40 49.10 6.78 C48.22 6.09 47.07 5.35 46.46 5.07 C46.15 4.92 45.77 4.72 45.61 4.61 C45.23 4.33 42.40 3.41 41.61 3.30 C41.25 3.25 38.77 3.20 36.11 3.19 L31.27 3.16 L31.04 3.44 C30.91 3.59 30.80 3.81 30.79 3.93 C30.78 4.05 30.79 7.12 30.80 10.74 C30.81 16.61 30.83 17.37 30.97 17.61 C31.24 18.06 31.47 18.11 32.91 18.00 C34.76 17.86 37.88 17.86 38.28 18.01 C38.91 18.23 39.12 19.22 38.65 19.79 C38.21 20.30 37.96 20.33 34.96 20.24 C31.19 20.12 31.35 20.11 31.02 20.43 L30.75 20.70 L30.75 24.50 C30.75 28.22 30.75 28.30 30.96 28.50 C31.08 28.62 31.32 28.74 31.51 28.78 C31.70 28.82 33.83 28.82 36.25 28.79 C41.10 28.72 41.24 28.71 42.96 28.04 C43.47 27.85 44.20 27.46 44.60 27.19 C45.53 26.54 46.71 25.32 47.16 24.55 C47.35 24.22 47.60 23.81 47.71 23.63 C47.97 23.22 48.56 20.60 48.64 19.45 C48.73 18.33 48.59 17.19 48.19 15.73 C47.93 14.78 47.78 14.46 47.20 13.58 C46.51 12.52 45.30 11.25 44.38 10.62 C44.12 10.44 43.51 10.11 43.03 9.89 C41.82 9.33 40.86 9.20 37.55 9.14 C36.02 9.11 34.73 9.04 34.57 8.98 C34.18 8.83 33.98 8.38 33.98 7.65 C33.98 6.97 34.17 6.48 34.53 6.28 C34.79 6.13 41.30 6.15 42.20 6.31 C43.06 6.45 44.86 7.21 45.81 7.83 C47.22 8.74 49.27 10.89 50.06 12.30 C50.23 12.60 50.48 13.05 50.63 13.30 C51.03 14.01 51.78 16.36 51.91 17.35 C51.98 17.88 52.01 18.91 51.98 19.90 C51.94 21.37 51.90 21.63 51.66 22.30 C51.51 22.71 51.28 23.39 51.15 23.80 C51.01 24.21 50.74 24.78 50.55 25.07 C50.36 25.36 50.04 25.85 49.84 26.16 C49.37 26.86 48.07 28.18 47.04 29.00 C46.05 29.78 44.20 30.70 42.85 31.07 L41.85 31.34 L36.60 31.37 C31.66 31.39 31.34 31.41 31.10 31.58 C30.35 32.14 30.47 34.15 31.27 34.55 C31.46 34.65 34.38 34.65 39.85 34.57 Z M34.63 25.50 C34.04 25.15 33.97 24.03 34.51 23.54 C34.70 23.37 34.94 23.35 37.14 23.30 C39.37 23.25 39.58 23.23 39.95 23.03 C40.49 22.74 40.86 22.33 41.04 21.83 C41.31 21.07 41.43 19.82 41.37 18.56 C41.26 16.44 40.94 15.71 39.85 15.15 L39.26 14.85 L37.02 14.83 C34.55 14.80 34.45 14.78 34.14 14.18 C33.91 13.73 33.99 12.88 34.30 12.55 C34.43 12.42 34.67 12.26 34.84 12.20 C35.23 12.07 40.57 12.25 41.13 12.40 C42.07 12.67 43.39 13.73 44.30 14.95 C44.93 15.78 45.07 16.09 45.26 17.07 C45.53 18.52 45.38 21.05 44.94 22.08 C44.72 22.62 43.83 23.74 43.20 24.30 C42.05 25.29 41.45 25.44 37.88 25.60 C34.95 25.73 35.00 25.73 34.63 25.50 Z" fill="#000" fill-rule="evenodd"/>
+      </svg>
+
+      <div style="display:flex; gap:14px; align-items:center;">
+        <svg style="width:20px;height:20px;" viewBox="0 0 21 22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M9.71 20.24 C12.47 19.82 14.94 18.02 16.40 15.36 C17.01 14.25 17.16 13.82 17.37 12.50 C17.53 11.50 17.53 10.75 17.37 9.75 C17.17 8.49 16.93 7.71 16.57 7.16 C16.40 6.89 16.16 6.48 16.05 6.27 C15.94 6.05 15.58 5.54 15.25 5.12 C13.81 3.35 11.91 2.23 11.63 3.02 C11.56 3.22 11.64 3.42 12.19 4.54 C12.91 6.00 13.00 6.40 13.00 8.12 C13.00 9.45 12.89 10.00 12.39 11.35 C12.04 12.27 11.81 12.74 11.37 13.38 C10.35 14.90 8.83 16.25 7.23 17.05 C6.28 17.53 5.73 17.67 4.75 17.67 C3.52 17.67 3.17 17.82 3.17 18.36 C3.17 18.88 3.88 19.31 5.71 19.87 C7.44 20.41 8.11 20.48 9.71 20.24 Z" fill="#000" fill-rule="evenodd"/>
+        </svg>
+      </div>
+  </header>
+
+  <!-- Centered Interactive Mind Stage -->
+  <main class="stage">
+    <div class="figure-wrapper" id="figureBox" title="Tap to speak with MindAI">
+      <div class="aura-ring"></div>
+      <div class="bust-container">
+        <video class="bust-v" muted playsinline loop preload="auto" disablepictureinpicture tabindex="-1" aria-hidden="true" src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/24f3c998-86fb-4f1d-9906-07c7fa740f8a.mp4"></video>
+      </div>
+
+      <!-- Touch Prompt Indicator -->
+      <div class="touch-trigger" id="touchBtn">
+        <div class="status-dot"></div>
+        <span id="statusText">Tap to speak</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Minimal Subtitle for Agent Spoken Output or Error -->
+  <footer class="subtitle-bar" id="subtitleText">
+    <!-- Spoken answer text or error displays here -->
+  </footer>
+
+  <!-- API Key Gateway Overlay -->
+  <div class="key-gate" id="keyGate">
+    <div class="gate-card">
+      <svg style="width:44px;height:28px;" viewBox="0 0 60 38" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MindAI">
+        <path d="M27.40 34.52 C27.59 34.43 27.80 34.24 27.87 34.10 C28.07 33.71 28.05 21.22 27.86 20.75 C27.57 20.06 27.67 20.07 23.23 20.18 C20.54 20.24 19.15 20.31 18.95 20.39 C18.00 20.77 17.83 21.72 18.57 22.46 C19.24 23.13 19.43 23.20 20.66 23.20 C21.27 23.20 22.02 23.15 22.31 23.08 C22.61 23.02 23.05 22.96 23.29 22.96 C23.65 22.96 23.77 23.01 24.01 23.27 C24.40 23.71 24.48 24.21 24.24 24.78 C24.13 25.03 23.92 25.32 23.77 25.44 C23.51 25.63 23.37 25.65 22.32 25.62 C18.00 25.51 16.98 25.24 15.55 23.83 C14.47 22.77 14.01 22.03 13.69 20.80 C13.36 19.56 13.38 18.26 13.73 16.95 C13.88 16.41 14.08 15.84 14.18 15.69 C15.55 13.60 16.89 12.64 18.81 12.41 C19.27 12.35 20.52 12.30 21.58 12.29 C23.22 12.28 23.54 12.30 23.76 12.44 C24.13 12.69 24.40 13.19 24.40 13.64 C24.40 13.95 24.33 14.09 24.00 14.42 L23.61 14.82 L22.38 14.73 C21.70 14.69 20.74 14.65 20.23 14.65 C19.37 14.65 19.30 14.67 18.88 14.96 C18.30 15.39 18.06 15.82 18.06 16.46 C18.06 17.02 18.24 17.39 18.66 17.67 C18.89 17.82 19.37 17.84 23.08 17.86 C27.68 17.89 27.59 17.90 27.85 17.27 C28.03 16.82 28.00 9.86 27.81 9.52 C27.55 9.03 27.29 9.00 23.23 9.00 C18.23 9.00 17.31 9.11 15.63 9.90 C14.14 10.60 12.78 11.84 11.88 13.32 C11.65 13.68 11.39 14.12 11.28 14.28 C11.18 14.45 10.90 15.16 10.67 15.87 L10.26 17.15 L10.25 19.05 L10.25 20.95 L10.71 22.15 C11.30 23.72 12.01 24.80 13.19 25.92 C14.16 26.85 15.03 27.42 16.22 27.92 C17.75 28.57 18.07 28.62 21.30 28.67 C24.43 28.71 24.55 28.73 24.81 29.21 C24.98 29.54 24.94 30.37 24.73 30.73 C24.38 31.33 24.05 31.42 22.35 31.35 C17.25 31.14 15.82 30.94 14.18 30.20 C12.97 29.64 11.70 28.82 10.92 28.06 C10.17 27.35 9.14 26.05 8.79 25.40 C8.63 25.10 8.40 24.70 8.28 24.51 C8.08 24.19 7.97 23.93 7.32 22.15 C7.08 21.51 7.06 21.29 7.02 19.48 C7.00 18.32 7.03 17.16 7.09 16.66 C7.24 15.53 8.00 13.33 8.52 12.50 C8.75 12.14 9.04 11.68 9.16 11.48 C9.48 10.98 10.98 9.50 11.73 8.95 C12.90 8.11 14.58 7.33 16.17 6.90 C18.15 6.36 19.12 6.28 23.42 6.31 C26.76 6.33 27.11 6.32 27.35 6.16 C27.71 5.92 27.90 5.43 27.90 4.73 C27.90 4.00 27.66 3.51 27.20 3.27 C26.87 3.10 26.51 3.09 22.00 3.13 C16.65 3.18 16.94 3.15 14.65 3.89 C13.26 4.35 11.68 5.08 10.82 5.68 C9.15 6.85 7.54 8.28 6.97 9.10 C6.80 9.35 6.53 9.70 6.37 9.89 C6.21 10.08 6.01 10.38 5.94 10.56 C5.86 10.74 5.62 11.17 5.41 11.50 C5.19 11.84 4.98 12.25 4.94 12.43 C4.91 12.61 4.70 13.18 4.49 13.70 C3.89 15.20 3.75 16.11 3.76 18.50 C3.77 20.71 3.97 22.65 4.29 23.55 C4.39 23.82 4.62 24.46 4.79 24.95 C4.96 25.45 5.23 26.03 5.39 26.25 C5.54 26.47 5.78 26.85 5.90 27.10 C6.54 28.35 8.93 30.70 11.06 32.16 C11.98 32.79 13.97 33.64 15.12 33.89 C15.63 34.00 16.43 34.19 16.90 34.31 C17.69 34.51 18.07 34.53 22.15 34.59 C24.57 34.63 26.66 34.67 26.80 34.68 C26.94 34.69 27.21 34.62 27.40 34.52 Z M39.85 34.57 C41.79 34.53 42.01 34.51 42.75 34.27 C43.19 34.13 43.91 33.92 44.35 33.81 C45.85 33.44 48.12 32.22 49.58 31.01 C50.26 30.44 51.75 28.79 52.38 27.91 C52.61 27.58 52.94 27.03 53.10 26.68 C53.26 26.33 53.48 25.91 53.60 25.75 C53.71 25.59 53.90 25.13 54.01 24.75 C54.12 24.37 54.37 23.60 54.56 23.04 C55.00 21.73 55.14 20.47 55.06 18.57 C54.98 16.69 54.86 15.91 54.44 14.64 C54.25 14.08 54.10 13.53 54.10 13.42 C54.10 13.31 53.94 12.91 53.74 12.54 C53.54 12.16 53.25 11.60 53.10 11.28 C52.94 10.97 52.68 10.57 52.52 10.38 C52.36 10.20 52.10 9.85 51.93 9.60 C51.57 9.07 49.89 7.40 49.10 6.78 C48.22 6.09 47.07 5.35 46.46 5.07 C46.15 4.92 45.77 4.72 45.61 4.61 C45.23 4.33 42.40 3.41 41.61 3.30 C41.25 3.25 38.77 3.20 36.11 3.19 L31.27 3.16 L31.04 3.44 C30.91 3.59 30.80 3.81 30.79 3.93 C30.78 4.05 30.79 7.12 30.80 10.74 C30.81 16.61 30.83 17.37 30.97 17.61 C31.24 18.06 31.47 18.11 32.91 18.00 C34.76 17.86 37.88 17.86 38.28 18.01 C38.91 18.23 39.12 19.22 38.65 19.79 C38.21 20.30 37.96 20.33 34.96 20.24 C31.19 20.12 31.35 20.11 31.02 20.43 L30.75 20.70 L30.75 24.50 C30.75 28.22 30.75 28.30 30.96 28.50 C31.08 28.62 31.32 28.74 31.51 28.78 C31.70 28.82 33.83 28.82 36.25 28.79 C41.10 28.72 41.24 28.71 42.96 28.04 C43.47 27.85 44.20 27.46 44.60 27.19 C45.53 26.54 46.71 25.32 47.16 24.55 C47.35 24.22 47.60 23.81 47.71 23.63 C47.97 23.22 48.56 20.60 48.64 19.45 C48.73 18.33 48.59 17.19 48.19 15.73 C47.93 14.78 47.78 14.46 47.20 13.58 C46.51 12.52 45.30 11.25 44.38 10.62 C44.12 10.44 43.51 10.11 43.03 9.89 C41.82 9.33 40.86 9.20 37.55 9.14 C36.02 9.11 34.73 9.04 34.57 8.98 C34.18 8.83 33.98 8.38 33.98 7.65 C33.98 6.97 34.17 6.48 34.53 6.28 C34.79 6.13 41.30 6.15 42.20 6.31 C43.06 6.45 44.86 7.21 45.81 7.83 C47.22 8.74 49.27 10.89 50.06 12.30 C50.23 12.60 50.48 13.05 50.63 13.30 C51.03 14.01 51.78 16.36 51.91 17.35 C51.98 17.88 52.01 18.91 51.98 19.90 C51.94 21.37 51.90 21.63 51.66 22.30 C51.51 22.71 51.28 23.39 51.15 23.80 C51.01 24.21 50.74 24.78 50.55 25.07 C50.36 25.36 50.04 25.85 49.84 26.16 C49.37 26.86 48.07 28.18 47.04 29.00 C46.05 29.78 44.20 30.70 42.85 31.07 L41.85 31.34 L36.60 31.37 C31.66 31.39 31.34 31.41 31.10 31.58 C30.35 32.14 30.47 34.15 31.27 34.55 C31.46 34.65 34.38 34.65 39.85 34.57 Z M34.63 25.50 C34.04 25.15 33.97 24.03 34.51 23.54 C34.70 23.37 34.94 23.35 37.14 23.30 C39.37 23.25 39.58 23.23 39.95 23.03 C40.49 22.74 40.86 22.33 41.04 21.83 C41.31 21.07 41.43 19.82 41.37 18.56 C41.26 16.44 40.94 15.71 39.85 15.15 L39.26 14.85 L37.02 14.83 C34.55 14.80 34.45 14.78 34.14 14.18 C33.91 13.73 33.99 12.88 34.30 12.55 C34.43 12.42 34.67 12.26 34.84 12.20 C35.23 12.07 40.57 12.25 41.13 12.40 C42.07 12.67 43.39 13.73 44.30 14.95 C44.93 15.78 45.07 16.09 45.26 17.07 C45.53 18.52 45.38 21.05 44.94 22.08 C44.72 22.62 43.83 23.74 43.20 24.30 C42.05 25.29 41.45 25.44 37.88 25.60 C34.95 25.73 35.00 25.73 34.63 25.50 Z" fill="#000" fill-rule="evenodd"/>
+      </svg>
+      <h2 class="gate-title">Awaken MindAI</h2>
+      <p class="gate-sub">Enter your OpenAI API key to activate the voice neural advisor.</p>
+
+      <form class="input-box" id="keyForm" onsubmit="event.preventDefault(); submitKey();">
+        <input type="password" class="key-input" id="apiKeyInput" placeholder="sk-..." autocomplete="off" spellcheck="false" required />
+        <button type="submit" class="submit-arrow" title="Awaken">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
+
+      <div class="chip-row" id="sysChipRow" style="display:none;">
+        <button type="button" class="sys-chip" id="useSysKeyBtn">Use System Credential</button>
+      </div>
+
+      <div class="gate-msg" id="gateMsg"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    var body = document.body;
+    var figureBox = document.getElementById('figureBox');
+    var touchBtn = document.getElementById('touchBtn');
+    var statusText = document.getElementById('statusText');
+    var subtitleText = document.getElementById('subtitleText');
+    var v = document.querySelector('.bust-v');
+
+    var keyGate = document.getElementById('keyGate');
+    var apiKeyInput = document.getElementById('apiKeyInput');
+    var gateMsg = document.getElementById('gateMsg');
+    var keyIconBtn = document.getElementById('keyIconBtn');
+    var sysChipRow = document.getElementById('sysChipRow');
+    var useSysKeyBtn = document.getElementById('useSysKeyBtn');
+
+    var currentState = 'idle'; // idle, listening, thinking, speaking
+    var isUnlocked = true; // default unlocked if system key exists
+    var audioCtx = null;
+    var mediaStream = null;
+    var scriptProcessor = null;
+    var dummyGain = null;
+    var audioChunks = [];
+    var currentAudioPlayer = null;
+    var actualSampleRate = 24000;
+
+    // --- Background Twinkle Stardust Canvas ---
+    var canvas = document.getElementById('starCanvas');
+    var ctx = canvas.getContext('2d');
+    var stars = [];
+    var w = 0, h = 0;
+
+    function resizeCanvas() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    for (var s = 0; s < 45; s++) {
+      stars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.5 + 0.6,
+        alpha: Math.random() * 0.7 + 0.2,
+        speed: Math.random() * 0.35 + 0.15,
+        twinkleSpeed: Math.random() * 0.02 + 0.01,
+        color: ['rgba(255,180,210,', 'rgba(170,215,255,', 'rgba(215,185,255,', 'rgba(255,230,190,'][Math.floor(Math.random() * 4)]
+      });
+    }
+
+    function renderStars() {
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < stars.length; i++) {
+        var p = stars[i];
+        p.y -= p.speed;
+        if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+        p.alpha += Math.sin(Date.now() * p.twinkleSpeed) * 0.01;
+        p.alpha = Math.max(0.15, Math.min(0.85, p.alpha));
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + p.alpha + ')';
+        ctx.fill();
+      }
+      requestAnimationFrame(renderStars);
+    }
+    renderStars();
+
+    // Anchor first frame of video
+    if (v) {
+      v.pause();
+      function anchorVideo(){
+        if (!v.currentTime) v.currentTime = 0.001;
+      }
+      v.addEventListener('loadeddata', anchorVideo, {once:true});
+      if (v.readyState >= 2) anchorVideo();
+
+      // Mouse scrub dial
+      var prevX = null;
+      var SENSITIVITY = 0.7;
+      window.addEventListener('mousemove', function(e){
+        if (!isUnlocked || currentState !== 'idle' || !v.duration) return;
+        if (prevX === null) { prevX = e.clientX; return; }
+        var delta = prevX - e.clientX;
+        prevX = e.clientX;
+        if (!delta) return;
+        var t = v.currentTime + (delta / window.innerWidth) * SENSITIVITY * v.duration;
+        v.currentTime = Math.min(Math.max(t, 0), v.duration);
+      }, { passive: true });
+      document.addEventListener('mouseleave', function(){ prevX = null; });
+    }
+
+    // --- State and UI Updates ---
+    function setVisualState(state, message) {
+      currentState = state;
+      body.setAttribute('data-state', state);
+      if (message) {
+        statusText.textContent = message;
+      } else {
+        if (state === 'idle') statusText.textContent = 'Tap to speak';
+        else if (state === 'listening') statusText.textContent = 'Listening... (Tap to answer)';
+        else if (state === 'thinking') statusText.textContent = 'Thinking...';
+        else if (state === 'speaking') statusText.textContent = 'Speaking...';
+      }
+    }
+
+    function unlockApp() {
+      isUnlocked = true;
+      body.classList.remove('locked');
+      gateMsg.textContent = '';
+      subtitleText.className = 'subtitle-bar';
+    }
+
+    function lockApp(msg) {
+      isUnlocked = false;
+      body.classList.add('locked');
+      if (msg) gateMsg.textContent = msg;
+    }
+
+    keyIconBtn.addEventListener('click', function(){
+      if (body.classList.contains('locked')) {
+        body.classList.remove('locked');
+      } else {
+        body.classList.add('locked');
+      }
+    });
+
+    // --- Streamlit Protocol ---
+    function sendToStreamlit(data) {
+      window.parent.postMessage({
+        isStreamlitMessage: true,
+        type: "streamlit:setComponentValue",
+        value: data
+      }, "*");
+    }
+
+    function notifyReady() {
+      window.parent.postMessage({
+        isStreamlitMessage: true,
+        type: "streamlit:componentReady",
+        apiVersion: 1
+      }, "*");
+
+      window.parent.postMessage({
+        isStreamlitMessage: true,
+        type: "streamlit:setFrameHeight",
+        height: Math.max(window.innerHeight, 780)
+      }, "*");
+    }
+
+    notifyReady();
+    window.addEventListener('resize', function(){
+      window.parent.postMessage({
+        isStreamlitMessage: true,
+        type: "streamlit:setFrameHeight",
+        height: Math.max(window.innerHeight, 780)
+      }, "*");
+    });
+
+    // Handle messages arriving from Python / Streamlit
+    window.addEventListener('message', function(event) {
+      if (!event.data || event.data.type !== 'streamlit:render') return;
+      var args = event.data.args || {};
+
+      if (args.has_system_key) {
+        sysChipRow.style.display = 'flex';
+      }
+
+      if (args.is_authenticated) {
+        unlockApp();
+      } else {
+        lockApp(args.auth_error || '');
+      }
+
+      if (args.audio_url && args.status === 'speaking') {
+        playResponseAudio(args.audio_url, args.transcript || '');
+      } else if (args.status === 'error') {
+        setVisualState('idle', 'Tap to retry');
+        subtitleText.textContent = args.error_message || 'An error occurred. Tap figure to try again.';
+        subtitleText.className = 'subtitle-bar visible error-text';
+      }
+    });
+
+    // --- API Key Handlers ---
+    window.submitKey = function() {
+      var key = apiKeyInput.value.trim();
+      if (!key) {
+        gateMsg.textContent = 'Please enter a valid OpenAI API key.';
+        return;
+      }
+      gateMsg.textContent = 'Authenticating...';
+      sendToStreamlit({
+        action: 'set_api_key',
+        api_key: key,
+        timestamp: Date.now()
+      });
+    };
+
+    useSysKeyBtn.addEventListener('click', function(){
+      gateMsg.textContent = 'Connecting with system credential...';
+      sendToStreamlit({
+        action: 'use_system_key',
+        timestamp: Date.now()
+      });
+    });
+
+    // --- Audio Playback ---
+    function playResponseAudio(audioUrl, transcript) {
+      if (currentAudioPlayer) {
+        currentAudioPlayer.pause();
+        currentAudioPlayer = null;
+      }
+
+      setVisualState('speaking', 'Speaking...');
+      subtitleText.textContent = transcript;
+      subtitleText.className = 'subtitle-bar visible';
+
+      if (v) {
+        v.playbackRate = 0.85;
+        v.play().catch(function(){});
+      }
+
+      var player = new Audio(audioUrl);
+      currentAudioPlayer = player;
+
+      player.onended = function() {
+        if (v) v.pause();
+        setVisualState('idle', 'Tap to speak');
+        setTimeout(function(){
+          subtitleText.className = 'subtitle-bar';
+        }, 5000);
+      };
+
+      player.onerror = function() {
+        if (v) v.pause();
+        setVisualState('idle', 'Tap to speak');
+      };
+
+      player.play().catch(function(e){
+        console.warn('Autoplay prevented:', e);
+        if (v) v.pause();
+        setVisualState('idle', 'Tap to speak');
+      });
+    }
+
+    // --- Audio Recording via Web Audio API ---
+    async function startListening() {
+      if (!isUnlocked) {
+        body.classList.add('locked');
+        return;
+      }
+      try {
+        audioChunks = [];
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+        actualSampleRate = audioCtx.sampleRate || 24000;
+
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            channelCount: 1,
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        var source = audioCtx.createMediaStreamSource(mediaStream);
+
+        scriptProcessor = audioCtx.createScriptProcessor(4096, 1, 1);
+        scriptProcessor.onaudioprocess = function(e) {
+          var input = e.inputBuffer.getChannelData(0);
+          audioChunks.push(new Float32Array(input));
+        };
+
+        // Silent gain node to avoid acoustic speaker feedback
+        dummyGain = audioCtx.createGain();
+        dummyGain.gain.value = 0;
+
+        source.connect(scriptProcessor);
+        scriptProcessor.connect(dummyGain);
+        dummyGain.connect(audioCtx.destination);
+
+        setVisualState('listening', 'Listening... (Tap to answer)');
+        subtitleText.className = 'subtitle-bar';
+        subtitleText.textContent = '';
+
+        if (v) {
+          v.playbackRate = 0.6;
+          v.play().catch(function(){});
+        }
+      } catch (err) {
+        console.error('Mic error:', err);
+        setVisualState('idle', 'Mic permission needed');
+        subtitleText.textContent = 'Microphone access denied or unavailable.';
+        subtitleText.className = 'subtitle-bar visible error-text';
+      }
+    }
+
+    function stopAndSendAudio() {
+      setVisualState('thinking', 'Thinking...');
+      if (v) v.pause();
+
+      if (scriptProcessor) {
+        scriptProcessor.disconnect();
+        scriptProcessor = null;
+      }
+      if (dummyGain) {
+        dummyGain.disconnect();
+        dummyGain = null;
+      }
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(function(track){ track.stop(); });
+        mediaStream = null;
+      }
+
+      if (!audioChunks || audioChunks.length === 0) {
+        setVisualState('idle', 'No speech detected. Tap to speak');
+        if (audioCtx) { audioCtx.close(); audioCtx = null; }
+        return;
+      }
+
+      var totalLen = 0;
+      for (var i = 0; i < audioChunks.length; i++) totalLen += audioChunks[i].length;
+      var merged = new Float32Array(totalLen);
+      var offset = 0;
+      for (var j = 0; j < audioChunks.length; j++) {
+        merged.set(audioChunks[j], offset);
+        offset += audioChunks[j].length;
+      }
+
+      var wavBuffer = encodeWAV(merged, actualSampleRate);
+      if (audioCtx) { audioCtx.close(); audioCtx = null; }
+
+      // Safe chunked base64 conversion (no stack overflow)
+      var b64Wav = bufferToBase64(wavBuffer);
+
+      sendToStreamlit({
+        action: 'query',
+        audio_b64: b64Wav,
+        sample_rate: actualSampleRate,
+        timestamp: Date.now()
+      });
+    }
+
+    function bufferToBase64(buffer) {
+      var binary = '';
+      var bytes = new Uint8Array(buffer);
+      var len = bytes.byteLength;
+      var chunkSize = 0x8000;
+      for (var i = 0; i < len; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunkSize, len)));
+      }
+      return btoa(binary);
+    }
+
+    function encodeWAV(samples, sampleRate) {
+      var buffer = new ArrayBuffer(44 + samples.length * 2);
+      var view = new DataView(buffer);
+
+      function writeString(offset, string) {
+        for (var i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      }
+
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true); // PCM format
+      view.setUint16(22, 1, true); // mono
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true); // byte rate
+      view.setUint16(32, 2, true); // block align
+      view.setUint16(34, 16, true); // 16-bit
+      writeString(36, 'data');
+      view.setUint32(40, samples.length * 2, true);
+
+      var offset = 44;
+      for (var i = 0; i < samples.length; i++, offset += 2) {
+        var s = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+      return buffer;
+    }
+
+    function handleFigureTouch() {
+      if (!isUnlocked) {
+        body.classList.add('locked');
+        return;
+      }
+      if (currentState === 'idle') {
+        startListening();
+      } else if (currentState === 'listening') {
+        stopAndSendAudio();
+      } else if (currentState === 'speaking') {
+        if (currentAudioPlayer) {
+          currentAudioPlayer.pause();
+          currentAudioPlayer = null;
+        }
+        startListening();
+      }
+    }
+
+    figureBox.addEventListener('click', handleFigureTouch);
+    touchBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      handleFigureTouch();
+    });
+  })();
+  </script>
+</body>
+</html>
