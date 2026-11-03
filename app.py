@@ -100,6 +100,18 @@ def get_voice_pipeline(api_key: str):
     )
     return pipeline
 
+import threading
+
+@st.cache_resource
+def get_background_loop():
+    loop = asyncio.new_event_loop()
+    threading.Thread(target=loop.run_forever, daemon=True).start()
+    return loop
+
+def run_async(coro):
+    loop = get_background_loop()
+    return asyncio.run_coroutine_threadsafe(coro, loop).result()
+
 async def run_pipeline(audio_arr: np.ndarray, api_key: str):
     pipeline = get_voice_pipeline(api_key)
     audio_input = AudioInput(buffer=audio_arr, frame_rate=SAMPLE_RATE)
@@ -193,7 +205,7 @@ if component_val and isinstance(component_val, dict):
                         if len(audio_arr) == 0:
                             raise ValueError("No audio data received.")
 
-                        text_resp, audio_uri = asyncio.run(
+                        text_resp, audio_uri = run_async(
                             run_pipeline(audio_arr, current_key)
                         )
 
